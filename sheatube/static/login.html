@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In – Sheatube</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0a0a0f; --surface:#111118; --card:#16161f; --border:#252530; --accent:#ff3c5c; --accent2:#ff8c42; --text:#f0f0f5; --muted:#6b6b80; --hover:#1e1e2a; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; display:flex; flex-direction:column; }
+  nav { background:rgba(10,10,15,0.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:0 2rem; height:60px; display:flex; align-items:center; }
+  .logo { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:2px; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-decoration:none; }
+
+  .center { flex:1; display:flex; align-items:center; justify-content:center; padding:2rem; }
+  .box { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:2.5rem; width:100%; max-width:400px; }
+  .box-logo { text-align:center; margin-bottom:2rem; }
+  .box-logo span { font-family:'Bebas Neue',sans-serif; font-size:2.5rem; letter-spacing:3px; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .box h1 { font-size:1.4rem; font-weight:600; margin-bottom:0.25rem; text-align:center; }
+  .box .sub { color:var(--muted); font-size:0.875rem; text-align:center; margin-bottom:2rem; }
+
+  .form-group { margin-bottom:1.1rem; }
+  label { display:block; font-size:0.8rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.4rem; }
+  input { width:100%; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:0.7rem 1rem; color:var(--text); font-family:inherit; font-size:0.95rem; outline:none; transition:border-color 0.2s; }
+  input:focus { border-color:var(--accent); }
+
+  .btn-submit { width:100%; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; border:none; border-radius:10px; padding:0.8rem; font-family:inherit; font-size:1rem; font-weight:600; cursor:pointer; margin-top:0.75rem; transition:opacity 0.2s; }
+  .btn-submit:hover { opacity:0.88; }
+  .btn-submit:disabled { opacity:0.4; cursor:not-allowed; }
+
+  .error-msg { background:rgba(255,60,60,0.1); border:1px solid rgba(255,60,60,0.3); border-radius:8px; padding:0.65rem 1rem; color:#ff8080; font-size:0.875rem; margin-bottom:1rem; display:none; }
+  .footer-link { text-align:center; margin-top:1.5rem; font-size:0.875rem; color:var(--muted); }
+  .footer-link a { color:var(--accent); text-decoration:none; font-weight:500; }
+  .footer-link a:hover { text-decoration:underline; }
+</style>
+</head>
+<body>
+<nav><a href="/" class="logo">SHEATUBE</a></nav>
+<div class="center">
+  <div class="box">
+    <div class="box-logo"><span>SHEATUBE</span></div>
+    <h1>Welcome back</h1>
+    <p class="sub">Log in to upload and manage your videos</p>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="username" placeholder="Your username" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Your password" autocomplete="current-password">
+    </div>
+
+    <button class="btn-submit" id="submitBtn" onclick="login()">Log In</button>
+    <div class="footer-link">Don't have an account? <a href="/register">Sign up</a></div>
+  </div>
+</div>
+
+<script>
+async function login(){
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const errEl = document.getElementById('errorMsg');
+  errEl.style.display='none';
+
+  if(!username||!password){ errEl.textContent='Please fill in all fields.'; errEl.style.display='block'; return; }
+  document.getElementById('submitBtn').disabled=true;
+
+  const r = await fetch('/api/auth/login',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username,password}) });
+  const d = await r.json();
+  if(r.ok){ location.href = '/'; }
+  else { errEl.textContent=d.error||'Login failed.'; errEl.style.display='block'; document.getElementById('submitBtn').disabled=false; }
+}
+
+document.addEventListener('keydown', e=>{ if(e.key==='Enter') login(); });
+// Redirect if already logged in
+fetch('/api/auth/me').then(r=>r.json()).then(d=>{ if(d.user) location.href='/'; });
+</script>
+</body>
+</html>
+

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload - Sheatube</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0a0a0f; --surface:#111118; --card:#16161f; --border:#252530; --accent:#ff3c5c; --accent2:#ff8c42; --text:#f0f0f5; --muted:#6b6b80; --hover:#1e1e2a; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+
+  nav { position:sticky; top:0; z-index:100; background:rgba(10,10,15,0.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:0 2rem; height:60px; display:flex; align-items:center; gap:1.5rem; }
+  .logo { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:2px; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-decoration:none; }
+  .back { color:var(--muted); text-decoration:none; font-size:0.875rem; display:flex; align-items:center; gap:0.4rem; transition:color 0.2s; }
+  .back:hover { color:var(--text); }
+  .nav-right { margin-left:auto; display:flex; align-items:center; gap:0.75rem; }
+  .btn { border-radius:8px; padding:0.45rem 1rem; font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; transition:opacity 0.2s; border:none; }
+  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--text); }
+  .user-chip { display:flex; align-items:center; gap:0.5rem; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:0.35rem 0.75rem; font-size:0.85rem; cursor:pointer; text-decoration:none; color:var(--text); }
+  .user-chip .avatar { width:22px; height:22px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:700; color:#fff; }
+
+  .page { max-width:680px; margin:3rem auto; padding:0 1.5rem 5rem; }
+  .page-header { text-align:center; margin-bottom:2.5rem; }
+  .page-header h1 { font-family:'Bebas Neue',sans-serif; font-size:3rem; letter-spacing:3px; background:linear-gradient(135deg,#fff 30%,var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .page-header p { color:var(--muted); margin-top:0.4rem; }
+
+  .login-gate { text-align:center; padding:3rem; background:var(--card); border:1px solid var(--border); border-radius:16px; }
+  .login-gate .big { font-size:3rem; margin-bottom:1rem; }
+  .login-gate h2 { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:2px; }
+  .login-gate p { color:var(--muted); margin:0.5rem 0 1.5rem; }
+  .login-gate .btns { display:flex; gap:0.75rem; justify-content:center; }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+
+  .drop-zone { border:2px dashed var(--border); border-radius:16px; padding:3rem 2rem; text-align:center; cursor:pointer; transition:border-color 0.2s, background 0.2s; position:relative; margin-bottom:1.5rem; background:var(--card); }
+  .drop-zone:hover,.drop-zone.dragover { border-color:var(--accent); background:rgba(255,60,92,0.04); }
+  .drop-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+  .drop-icon { font-size:3rem; margin-bottom:0.75rem; }
+  .drop-zone h2 { font-size:1.1rem; font-weight:600; }
+  .drop-zone p { color:var(--muted); font-size:0.85rem; margin-top:0.35rem; }
+  .file-types { display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap; margin-top:0.75rem; }
+  .badge { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:0.15rem 0.55rem; font-size:0.72rem; color:var(--muted); font-family:monospace; }
+
+  .preview-wrap { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:1.5rem; display:none; }
+  .preview-wrap video { width:100%; display:block; max-height:280px; }
+  .preview-info { padding:0.75rem 1rem; display:flex; align-items:center; gap:0.75rem; }
+  .fname { flex:1; font-size:0.85rem; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .fsize { color:var(--muted); font-size:0.78rem; flex-shrink:0; }
+  .remove-file { background:none; border:none; color:var(--muted); cursor:pointer; font-size:1rem; padding:0.25rem; transition:color 0.2s; }
+  .remove-file:hover { color:var(--accent); }
+
+  .form-group { margin-bottom:1.25rem; }
+  label { display:block; font-size:0.82rem; font-weight:600; color:var(--muted); letter-spacing:0.5px; text-transform:uppercase; margin-bottom:0.4rem; }
+  input[type=text], textarea { width:100%; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0.7rem 1rem; color:var(--text); font-family:inherit; font-size:0.95rem; outline:none; transition:border-color 0.2s; resize:vertical; }
+  input[type=text]:focus, textarea:focus { border-color:var(--accent); }
+  textarea { min-height:56px; }
+  select.mode-select { width:100%; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0.7rem 1rem; color:var(--text); font-family:inherit; font-size:0.95rem; outline:none; transition:border-color 0.2s; }
+  select.mode-select:focus { border-color:var(--accent); }
+  .hint { color:var(--muted); font-size:0.8rem; margin-top:0.4rem; line-height:1.4; }
+
+  .btn-submit { width:100%; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; border:none; border-radius:10px; padding:0.85rem; font-family:inherit; font-size:1rem; font-weight:600; cursor:pointer; transition:opacity 0.2s, transform 0.1s; margin-top:0.5rem; }
+  .btn-submit:hover:not(:disabled) { opacity:0.88; transform:translateY(-1px); }
+  .btn-submit:disabled { opacity:0.4; cursor:not-allowed; }
+
+  .progress-wrap { margin-top:1rem; display:none; }
+  .progress-bar { height:6px; background:var(--hover); border-radius:6px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:6px; width:0; transition:width 0.2s; }
+  .progress-label { font-size:0.8rem; color:var(--muted); margin-top:0.4rem; text-align:center; }
+
+  .success-state { text-align:center; padding:3rem 1rem; display:none; }
+  .success-state .big { font-size:3rem; margin-bottom:1rem; }
+  .success-state h2 { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:2px; }
+  .success-state p { color:var(--muted); margin-top:0.5rem 0 1.5rem; }
+  .success-btns { display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap; margin-top:1.5rem; }
+  .success-btns a { padding:0.6rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:600; font-size:0.9rem; transition:opacity 0.2s; }
+  .success-btns a:hover { opacity:0.8; }
+
+  .error-msg { background:rgba(255,60,60,0.1); border:1px solid rgba(255,60,60,0.3); border-radius:8px; padding:0.7rem 1rem; color:#ff8080; font-size:0.875rem; margin-top:0.75rem; display:none; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo">SHEATUBE</a>
+  <a href="/" class="back">Back to Browse</a>
+  <div class="nav-right" id="navRight"></div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Upload Video</h1>
+    <p>Upload full videos or Sheatube Sparks.</p>
+  </div>
+
+  <div id="loginGate" style="display:none" class="login-gate">
+    <div class="big">&#128274;</div>
+    <h2>Sign In to Upload</h2>
+    <p>You need an account to upload videos.</p>
+    <div class="btns">
+      <a href="/login" class="btn btn-primary">Log in</a>
+      <a href="/register" class="btn btn-ghost">Sign up</a>
+    </div>
+  </div>
+
+  <div id="formWrap" style="display:none">
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept="video/*">
+      <div class="drop-icon">&#127909;</div>
+      <h2>Drop your video here</h2>
+      <p>or click to browse</p>
+      <div class="file-types">
+        <span class="badge">mp4</span><span class="badge">webm</span><span class="badge">mov</span><span class="badge">avi</span><span class="badge">mkv</span>
+      </div>
+    </div>
+
+    <div class="preview-wrap" id="previewWrap">
+      <video id="previewVideo" controls muted></video>
+      <div class="preview-info">
+        <span class="fname" id="previewName"></span>
+        <span class="fsize" id="previewSize"></span>
+        <button class="remove-file" onclick="clearFile()">x</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Mode</label>
+      <select id="modeSelect" class="mode-select">
+        <option value="video">Standard Video</option>
+        <option value="spark">Spark</option>
+      </select>
+      <div class="hint" id="modeHint">Standard videos support all current video sizes and durations.</div>
+    </div>
+
+    <div class="form-group">
+      <label>Title *</label>
+      <input type="text" id="titleInput" placeholder="Give your video a title..." maxlength="200">
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="descInput" placeholder="What's this video about?"></textarea>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+    <button class="btn-submit" id="submitBtn" onclick="upload()">Upload Video</button>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-label" id="progressLabel">Uploading... 0%</div>
+    </div>
+  </div>
+
+  <div class="success-state" id="successState">
+    <div class="big">&#127881;</div>
+    <h2>Video Uploaded!</h2>
+    <p>Your video is now live.</p>
+    <div class="success-btns">
+      <a href="#" id="watchLink" class="btn-primary" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;">Watch Now</a>
+      <a href="/upload" style="border:1px solid var(--border);color:var(--text);">Upload Another</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+let selectedFile = null;
+let selectedMeta = null;
+let me = null;
+const MAX_APP_UPLOAD_BYTES = 500 * 1024 * 1024;
+const DEFAULT_CHUNK_SIZE = 8 * 1024 * 1024;
+const CHUNK_RETRIES = 3;
+
+async function init(){
+  const r = await fetch('/api/auth/me');
+  const d = await r.json();
+  me = d.user;
+  const nr = document.getElementById('navRight');
+  if(me){
+    nr.innerHTML = `<a href="/profile" class="user-chip"><div class="avatar">${esc(me.username[0].toUpperCase())}</div>${esc(me.username)}</a>`;
+    document.getElementById('formWrap').style.display = 'block';
+  } else {
+    nr.innerHTML = `<a href="/login" class="btn btn-ghost">Log in</a><a href="/register" class="btn btn-primary" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:8px;padding:.45rem 1rem;font-size:.85rem;font-weight:600;text-decoration:none;">Sign up</a>`;
+    document.getElementById('loginGate').style.display = 'block';
+  }
+}
+
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const modeSelect = document.getElementById('modeSelect');
+dropZone.addEventListener('dragover', e=>{ e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', ()=>dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e=>{ e.preventDefault(); dropZone.classList.remove('dragover'); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]).catch(err=>showError(err.message)); });
+fileInput.addEventListener('change', ()=>{ if(fileInput.files[0]) handleFile(fileInput.files[0]).catch(err=>showError(err.message)); });
+modeSelect.addEventListener('change', ()=> {
+  updateModeHint();
+  hideError();
+});
+
+function updateModeHint(){
+  const hint = document.getElementById('modeHint');
+  hint.textContent = modeSelect.value === 'spark'
+    ? 'Sparks are auto-cropped to portrait 1080x1920 and trimmed to under 60s.'
+    : 'Standard videos support all current video sizes and durations.';
+}
+
+function readVideoMeta(file){
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const v = document.createElement('video');
+    v.preload = 'metadata';
+    v.muted = true;
+    v.onloadedmetadata = () => {
+      const meta = {
+        duration: Number(v.duration || 0),
+        width: Number(v.videoWidth || 0),
+        height: Number(v.videoHeight || 0),
+      };
+      URL.revokeObjectURL(url);
+      resolve(meta);
+    };
+    v.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Could not read video metadata.'));
+    };
+    v.src = url;
+  });
+}
+
+async function handleFile(f){
+  if (f.size > MAX_APP_UPLOAD_BYTES){
+    const mb = Math.floor(MAX_APP_UPLOAD_BYTES / (1024 * 1024));
+    showError(`File is too large. Max ${mb}MB.`);
+    clearFile();
+    return;
+  }
+  const meta = await readVideoMeta(f);
+  selectedMeta = meta;
+  selectedFile = f;
+  document.getElementById('previewVideo').src = URL.createObjectURL(f);
+  document.getElementById('previewName').textContent = f.name;
+  document.getElementById('previewSize').textContent = fmtSize(f.size);
+  document.getElementById('previewWrap').style.display = 'block';
+  dropZone.style.display = 'none';
+  const ti = document.getElementById('titleInput');
+  if(!ti.value) ti.value = f.name.replace(/\.[^.]+$/,'').replace(/[_-]/g,' ');
+  hideError();
+}
+function clearFile(){ selectedFile=null; selectedMeta=null; fileInput.value=''; document.getElementById('previewVideo').src=''; document.getElementById('previewWrap').style.display='none'; dropZone.style.display='block'; }
+function fmtSize(b){ if(b>1e9)return(b/1e9).toFixed(1)+' GB'; if(b>1e6)return(b/1e6).toFixed(1)+' MB'; return(b/1e3).toFixed(0)+' KB'; }
+function showError(msg){ const el=document.getElementById('errorMsg'); el.textContent=msg; el.style.display='block'; }
+function hideError(){ document.getElementById('errorMsg').style.display='none'; }
+function setProgress(uploadedBytes, totalBytes, chunkIndex, totalChunks){
+  const safeTotal = Math.max(1, totalBytes);
+  const p = Math.min(100, Math.round((uploadedBytes / safeTotal) * 100));
+  document.getElementById('progressFill').style.width = p + '%';
+  document.getElementById('progressLabel').textContent = `Uploading chunk ${chunkIndex}/${totalChunks}... ${p}%`;
+}
+
+function uploadChunk(uploadId, chunkBlob, chunkIndex, totalChunks, uploadedBefore, totalBytes){
+  return new Promise((resolve, reject) => {
+    const fd = new FormData();
+    fd.append('upload_id', uploadId);
+    fd.append('chunk_index', String(chunkIndex));
+    fd.append('chunk', chunkBlob, `chunk-${chunkIndex}`);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/upload/chunk/part');
+    xhr.withCredentials = true;
+    xhr.timeout = 3 * 60 * 1000;
+
+    xhr.upload.addEventListener('progress', e => {
+      if (!e.lengthComputable) return;
+      setProgress(uploadedBefore + e.loaded, totalBytes, chunkIndex + 1, totalChunks);
+    });
+
+    xhr.addEventListener('load', () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        setProgress(uploadedBefore + chunkBlob.size, totalBytes, chunkIndex + 1, totalChunks);
+        resolve();
+        return;
+      }
+      let msg = `Chunk upload failed (${xhr.status}).`;
+      try {
+        const payload = JSON.parse(xhr.responseText);
+        if (payload && payload.error) msg = payload.error;
+      } catch (e) {}
+      reject(new Error(msg));
+    });
+
+    xhr.addEventListener('error', () => reject(new Error('Network error while uploading a chunk.')));
+    xhr.addEventListener('timeout', () => reject(new Error('Chunk upload timed out.')));
+    xhr.send(fd);
+  });
+}
+
+async function upload(){
+  hideError();
+  const title = document.getElementById('titleInput').value.trim();
+  const desc = document.getElementById('descInput').value.trim();
+  if(!selectedFile){ showError('Please select a video file.'); return; }
+  if(!title){ showError('Please enter a title.'); return; }
+  if(!selectedMeta){ showError('Could not read selected video metadata.'); return; }
+  const kind = modeSelect.value === 'spark' ? 'spark' : 'video';
+  if(selectedFile.size > MAX_APP_UPLOAD_BYTES){
+    const mb = Math.floor(MAX_APP_UPLOAD_BYTES / (1024 * 1024));
+    showError(`File is too large. Max ${mb}MB.`);
+    return;
+  }
+
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('progressFill').style.width='0%';
+  document.getElementById('progressLabel').textContent='Preparing upload...';
+
+  try{
+    const startRes = await fetch('/api/upload/chunk/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        filename: selectedFile.name,
+        file_size: selectedFile.size,
+        kind,
+        video_meta: selectedMeta,
+        title,
+        description: desc
+      })
+    });
+
+    const startPayload = await startRes.json().catch(()=>null);
+    if(!startRes.ok || !startPayload || !startPayload.upload_id){
+      throw new Error((startPayload && startPayload.error) || `Upload init failed (${startRes.status}).`);
+    }
+
+    const uploadId = startPayload.upload_id;
+    const chunkSize = Number(startPayload.chunk_size) > 0 ? Number(startPayload.chunk_size) : DEFAULT_CHUNK_SIZE;
+    const totalChunks = Math.ceil(selectedFile.size / chunkSize);
+    let uploadedBefore = 0;
+
+    for(let i=0; i<totalChunks; i++){
+      const start = i * chunkSize;
+      const end = Math.min(selectedFile.size, start + chunkSize);
+      const chunkBlob = selectedFile.slice(start, end);
+      let lastErr = null;
+
+      for(let attempt=1; attempt<=CHUNK_RETRIES; attempt++){
+        try{
+          await uploadChunk(uploadId, chunkBlob, i, totalChunks, uploadedBefore, selectedFile.size);
+          lastErr = null;
+          break;
+        }catch(err){
+          lastErr = err;
+          document.getElementById('progressLabel').textContent = `Retrying chunk ${i+1}/${totalChunks} (${attempt}/${CHUNK_RETRIES})...`;
+        }
+      }
+
+      if(lastErr) throw lastErr;
+      uploadedBefore += chunkBlob.size;
+    }
+
+    document.getElementById('progressLabel').textContent='Finalizing upload...';
+    const completeRes = await fetch('/api/upload/chunk/complete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ upload_id: uploadId, total_chunks: totalChunks })
+    });
+
+    const completePayload = await completeRes.json().catch(()=>null);
+    if(!completeRes.ok || !completePayload || !completePayload.id){
+      throw new Error((completePayload && completePayload.error) || `Upload finalize failed (${completeRes.status}).`);
+    }
+
+    document.getElementById('watchLink').href='/watch?id='+completePayload.id;
+    document.getElementById('formWrap').style.display='none';
+    document.getElementById('successState').style.display='block';
+  }catch(err){
+    showError((err && err.message) ? err.message : 'Upload failed.');
+    document.getElementById('submitBtn').disabled=false;
+    document.getElementById('progressWrap').style.display='none';
+  }
+}
+
+init();
+updateModeHint();
+</script>
+</body>
+</html>
+
+
+
+
+

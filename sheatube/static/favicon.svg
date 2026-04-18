@@ -1,0 +1,27 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="SHEATUBE favicon">
+  <defs>
+    <linearGradient id="brandGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff3c5c"/>
+      <stop offset="100%" stop-color="#ff8c42"/>
+    </linearGradient>
+    <linearGradient id="bgGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#151522"/>
+      <stop offset="100%" stop-color="#0a0a0f"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="url(#bgGlow)"/>
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="#252530" stroke-width="4"/>
+
+  <text
+    x="256"
+    y="274"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    fill="url(#brandGradient)"
+    font-family="'Arial Black', 'Impact', sans-serif"
+    font-size="74"
+    font-weight="900"
+    letter-spacing="2"
+  >SHEATUBE</text>
+</svg>

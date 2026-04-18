@@ -1,0 +1,302 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile - Sheatube</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0a0a0f; --surface:#111118; --card:#16161f; --border:#252530; --accent:#ff3c5c; --accent2:#ff8c42; --text:#f0f0f5; --muted:#6b6b80; --hover:#1e1e2a; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+  nav { position:sticky; top:0; z-index:100; background:rgba(10,10,15,0.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:0 2rem; height:60px; display:flex; align-items:center; gap:1.5rem; }
+  .logo { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:2px; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-decoration:none; }
+  .back { color:var(--muted); text-decoration:none; font-size:0.875rem; transition:color 0.2s; }
+  .back:hover { color:var(--text); }
+  .nav-right { margin-left:auto; display:flex; align-items:center; gap:0.75rem; }
+  .btn { border-radius:8px; padding:0.45rem 1rem; font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; transition:opacity 0.2s; border:none; }
+  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--text); }
+  .btn-ghost:hover { opacity:0.8; }
+
+  .page { max-width:960px; margin:0 auto; padding:2rem 2rem 5rem; }
+
+  .profile-header {
+    display:flex; align-items:center; gap:1.5rem;
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:2rem; margin-bottom:2rem;
+  }
+  .big-avatar {
+    width:80px; height:80px; border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Bebas Neue',sans-serif; font-size:2.5rem; color:#fff; flex-shrink:0;
+    overflow:hidden;
+  }
+  .big-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+  .profile-info h1 { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:2px; }
+  .profile-info .meta { color:var(--muted); font-size:0.85rem; margin-top:0.25rem; }
+  .profile-info .stats { display:flex; gap:1.5rem; margin-top:0.75rem; }
+  .stat { font-size:0.9rem; }
+  .stat .num { font-weight:700; font-size:1.1rem; color:var(--accent); }
+  .stat .lbl { color:var(--muted); font-size:0.78rem; }
+
+  .header-actions { margin-left:auto; display:flex; align-items:center; gap:0.55rem; flex-wrap:wrap; justify-content:flex-end; }
+  .logout-btn { background:transparent; border:1px solid #5a2030; color:#ff6080; border-radius:8px; padding:0.5rem 1rem; font-family:inherit; font-size:0.85rem; cursor:pointer; transition:background 0.2s; flex-shrink:0; }
+  .logout-btn:hover { background:rgba(255,60,80,0.12); }
+  .sub-btn { background:transparent; border:1px solid var(--border); color:var(--text); border-radius:999px; padding:0.45rem 0.95rem; font-size:0.82rem; cursor:pointer; }
+  .sub-btn.active { border-color:var(--accent); color:#ffd6df; background:rgba(255,60,92,0.12); }
+  .avatar-edit { margin-top:0.7rem; display:flex; gap:0.45rem; align-items:center; flex-wrap:wrap; }
+  .avatar-edit input[type="file"] { background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:0.35rem 0.5rem; font-size:0.8rem; min-width:260px; }
+  .avatar-edit button { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; border:none; border-radius:8px; padding:0.42rem 0.75rem; font-size:0.78rem; cursor:pointer; }
+  .avatar-hint { color:var(--muted); font-size:0.75rem; margin-top:0.35rem; }
+
+  .section-label { font-size:0.75rem; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem; }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1.1rem; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; text-decoration:none; color:inherit; transition:transform 0.2s, border-color 0.2s; display:block; }
+  .card:hover { transform:translateY(-3px); border-color:var(--accent); }
+  .thumb { width:100%; aspect-ratio:16/9; background:var(--surface); position:relative; overflow:hidden; }
+  .thumb video { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+  .card-body { padding:0.75rem 1rem; }
+  .card-title { font-weight:600; font-size:0.9rem; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .card-meta { display:flex; gap:0.75rem; color:var(--muted); font-size:0.76rem; margin-top:0.3rem; }
+  .kind-chip { position:absolute; top:0.5rem; left:0.5rem; background:rgba(0,0,0,0.6); color:#fff; border-radius:999px; padding:0.2rem 0.45rem; font-size:0.64rem; letter-spacing:.5px; text-transform:uppercase; }
+  .spark-card .thumb { aspect-ratio:9/16; }
+  .spark-overlay { position:absolute; inset:auto 0 0 0; background:linear-gradient(180deg,transparent 25%,rgba(0,0,0,0.92)); padding:0.85rem 0.75rem; }
+  .spark-title { font-size:0.86rem; font-weight:600; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; color:#f2f2f6; }
+  .spark-meta { color:#d7d7dd; font-size:0.74rem; margin-top:0.2rem; }
+
+  .empty { text-align:center; padding:4rem; color:var(--muted); }
+  .empty .big { font-size:3rem; margin-bottom:1rem; }
+  .empty h2 { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:2px; color:var(--text); }
+  .comments-wrap { margin-top:2.2rem; }
+  .comments-list { display:flex; flex-direction:column; gap:0.75rem; }
+  .comment-row {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:0.7rem 0.85rem;
+  }
+  .comment-head {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:0.8rem;
+    margin-bottom:0.35rem;
+    flex-wrap:wrap;
+  }
+  .comment-video {
+    color:var(--accent);
+    text-decoration:none;
+    font-size:0.84rem;
+    font-weight:600;
+  }
+  .comment-video:hover { text-decoration:underline; }
+  .comment-time { color:var(--muted); font-size:0.75rem; }
+  .comment-text { color:#e8e8ee; font-size:0.84rem; line-height:1.45; white-space:pre-wrap; word-break:break-word; }
+
+  .sk { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; animation:pulse 1.5s infinite; }
+  .sk-thumb { aspect-ratio:16/9; background:var(--hover); }
+  .sk-body { padding:.75rem 1rem; }
+  .sk-line { height:.8rem; background:var(--hover); border-radius:4px; margin-bottom:.5rem; }
+  .sk-line.short { width:55%; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo">SHEATUBE</a>
+  <a href="/" class="back">&larr; Browse</a>
+  <div class="nav-right" id="navRight"></div>
+</nav>
+
+<div class="page">
+  <div id="profileHeader"></div>
+  <div class="section-label" id="sectionLabel">Videos</div>
+  <div class="grid" id="grid">
+    <div class="sk"><div class="sk-thumb"></div><div class="sk-body"><div class="sk-line"></div><div class="sk-line short"></div></div></div>
+    <div class="sk"><div class="sk-thumb"></div><div class="sk-body"><div class="sk-line"></div><div class="sk-line short"></div></div></div>
+  </div>
+  <div class="comments-wrap">
+    <div class="section-label" id="commentsLabel">Comments</div>
+    <div class="comments-list" id="commentsList">
+      <div class="empty" style="padding:1.2rem;color:var(--muted);">Loading comments...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function timeAgo(iso){ const d=Date.now()-new Date(iso+'Z').getTime(),m=Math.floor(d/60000),h=Math.floor(m/60),dy=Math.floor(h/24); if(dy>365)return Math.floor(dy/365)+'y ago'; if(dy>30)return Math.floor(dy/30)+'mo ago'; if(dy>0)return dy+'d ago'; if(h>0)return h+'h ago'; if(m>0)return m+'m ago'; return 'Just now'; }
+function fv(n){ if(n>=1e6)return(n/1e6).toFixed(1)+'M'; if(n>=1e3)return(n/1e3).toFixed(1)+'K'; return n; }
+function streamUrl(id){ return '/api/stream/' + encodeURIComponent(id); }
+function avatarHtml(user,sizeClass='big-avatar'){
+  const name = (user && user.username) ? user.username : '?';
+  const fallback = esc(name[0].toUpperCase());
+  const url = (user && user.avatar_url) ? String(user.avatar_url).trim() : '';
+  return url ? `<div class="${sizeClass}"><img src="${esc(url)}" alt=""></div>` : `<div class="${sizeClass}">${fallback}</div>`;
+}
+function renderProfileComments(comments, isOwn, username){
+  const label = document.getElementById('commentsLabel');
+  const list = document.getElementById('commentsList');
+  label.textContent = isOwn ? 'Your Comments' : username + "'s Comments";
+  if(!Array.isArray(comments) || !comments.length){
+    list.innerHTML = `<div class="empty" style="padding:1.2rem;color:var(--muted);">No comments yet.</div>`;
+    return;
+  }
+  list.innerHTML = comments.map((c)=>{
+    const created = c.created_at ? timeAgo(c.created_at) : 'Unknown time';
+    const videoTitle = esc(c.video_title || 'Video');
+    const videoId = encodeURIComponent(c.video_id || '');
+    return `<article class="comment-row">
+      <div class="comment-head">
+        <a class="comment-video" href="/watch?id=${videoId}">${videoTitle}</a>
+        <div class="comment-time">${created}</div>
+      </div>
+      <div class="comment-text">${esc(c.text || '')}</div>
+    </article>`;
+  }).join('');
+}
+
+const params = new URLSearchParams(location.search);
+const viewUserId = params.get('user');
+
+let me = null;
+let profileUser = null;
+
+async function init(){
+  const r = await fetch('/api/auth/me');
+  const d = await r.json();
+  me = d.user;
+
+  const nr = document.getElementById('navRight');
+  if(me){
+    nr.innerHTML = `<a href="/upload" class="btn" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:8px;padding:.45rem 1rem;font-size:.85rem;font-weight:600;text-decoration:none;">Upload</a><a href="/profile" class="btn btn-ghost">${esc(me.username)}</a>`;
+  } else {
+    nr.innerHTML = `<a href="/login" class="btn btn-ghost">Log in</a>`;
+  }
+
+  const targetId = viewUserId || (me ? me.id : null);
+  if(!targetId){
+    document.getElementById('profileHeader').innerHTML='<div class="empty"><div class="big">[ ]</div><h2>Not Logged In</h2></div>';
+    document.getElementById('grid').innerHTML='';
+    renderProfileComments([], false, 'User');
+    return;
+  }
+
+  const isOwn = me && me.id === targetId;
+
+  const pr = await fetch('/api/users/'+targetId);
+  if(!pr.ok){
+    document.getElementById('profileHeader').innerHTML='<div class="empty"><h2>User Not Found</h2></div>';
+    document.getElementById('grid').innerHTML='';
+    renderProfileComments([], false, 'User');
+    return;
+  }
+  profileUser = await pr.json();
+
+  const [vr, cr] = await Promise.all([
+    fetch('/api/videos?user_id=' + encodeURIComponent(targetId)),
+    fetch('/api/users/' + encodeURIComponent(targetId) + '/comments')
+  ]);
+  const videos = await vr.json();
+  const comments = cr.ok ? await cr.json() : [];
+
+  const totalViews = videos.reduce((a,v)=>a+v.views,0);
+  const username = profileUser.username || (videos.length ? videos[0].uploader : 'User');
+
+  document.getElementById('profileHeader').innerHTML = `
+    <div class="profile-header">
+      ${avatarHtml(profileUser)}
+      <div class="profile-info">
+        <h1>${esc(username)}</h1>
+        <div class="meta">${isOwn ? 'Your channel' : 'Channel'}</div>
+        <div class="stats">
+          <div class="stat"><div class="num">${videos.length}</div><div class="lbl">Videos</div></div>
+          <div class="stat"><div class="num">${fv(totalViews)}</div><div class="lbl">Total Views</div></div>
+          <div class="stat"><div class="num" id="subsCount">${fv(profileUser.subscribers_count || 0)}</div><div class="lbl">Subscribers</div></div>
+        </div>
+        ${isOwn ? `<div class="avatar-edit"><input id="avatarFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><button onclick="uploadAvatar()">Upload Picture</button></div><div class="avatar-hint">PNG/JPG/WEBP/GIF, up to 5MB.</div>` : ``}
+      </div>
+      <div class="header-actions">
+        ${!isOwn && me ? `<button id="subBtn" class="sub-btn ${profileUser.is_subscribed ? 'active' : ''}" onclick="toggleSubscribe('${targetId}')">${profileUser.is_subscribed ? 'Subscribed' : 'Subscribe'}</button>` : ''}
+        ${isOwn ? `<button class="logout-btn" onclick="logout()">Log Out</button>` : ''}
+      </div>
+    </div>`;
+
+  document.getElementById('sectionLabel').textContent = isOwn ? 'Your Videos' : username+"'s Videos";
+  renderProfileComments(comments, !!isOwn, username);
+
+  if(!videos.length){
+    document.getElementById('grid').innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="big">[ ]</div><h2>No Videos Yet</h2>${isOwn?`<p style="margin-top:.5rem;color:var(--muted)"><a href="/upload" style="color:var(--accent)">Upload your first video</a></p>`:''}</div>`;
+    return;
+  }
+  document.getElementById('grid').innerHTML = videos.map(v=>{
+    if (v.kind === 'spark'){
+      return `<a class="card spark-card" href="/watch?id=${v.id}">
+        <div class="thumb">
+          <video src="${streamUrl(v.id)}" preload="metadata" muted playsinline disablepictureinpicture controlslist="nodownload noplaybackrate" oncontextmenu="return false;"></video>
+          <span class="kind-chip">Spark</span>
+          <div class="spark-overlay">
+            <div class="spark-title">${esc(v.title)}</div>
+            <div class="spark-meta">${fv(v.views)} views · ${timeAgo(v.uploaded_at)}</div>
+          </div>
+        </div>
+      </a>`;
+    }
+    return `<a class="card" href="/watch?id=${v.id}">
+      <div class="thumb">
+        <video src="${streamUrl(v.id)}" preload="metadata" muted playsinline disablepictureinpicture controlslist="nodownload noplaybackrate" oncontextmenu="return false;"></video>
+        <span class="kind-chip">Video</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${esc(v.title)}</div>
+        <div class="card-meta"><span>${fv(v.views)} views</span><span>${timeAgo(v.uploaded_at)}</span></div>
+      </div>
+    </a>`;
+  }).join('');
+  document.querySelectorAll('.thumb video').forEach(v=>{ v.addEventListener('loadedmetadata',()=>{ v.currentTime=0.05; }); });
+}
+
+async function toggleSubscribe(targetId){
+  if(!me) return;
+  const r = await fetch('/api/users/'+encodeURIComponent(targetId)+'/subscribe', { method:'POST' });
+  const d = await r.json();
+  if(!r.ok) return;
+  const btn = document.getElementById('subBtn');
+  if(btn){
+    btn.classList.toggle('active', !!d.subscribed);
+    btn.textContent = d.subscribed ? 'Subscribed' : 'Subscribe';
+  }
+  const count = document.getElementById('subsCount');
+  if(count) count.textContent = fv(d.subscribers_count || 0);
+}
+
+async function uploadAvatar(){
+  const input = document.getElementById('avatarFileInput');
+  if(!input || !input.files || !input.files[0]) return;
+  const fd = new FormData();
+  fd.append('avatar', input.files[0]);
+  const r = await fetch('/api/users/me/avatar', { method:'POST', body: fd });
+  if(!r.ok){
+    const d = await r.json().catch(()=>({}));
+    alert(d.error || 'Could not upload avatar.');
+    return;
+  }
+  await init();
+}
+
+async function logout(){
+  await fetch('/api/auth/logout',{method:'POST'});
+  location.href='/';
+}
+
+init();
+</script>
+</body>
+</html>
+
+
+
